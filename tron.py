@@ -1,7 +1,10 @@
-########################################
-#  tron.py - Written by Jack Lamb and Rees Parker for ME 100, Fall 2019
-#  Adapted from a snake game from pythonspot.com: https://pythonspot.com/snake-with-pygame/
-#  But really we only ended up using the structure, almost everything else was changed/added/replaced.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+GAME CLIENT
+Jr. Mints final project
+Jack Lamb and Rees Parker
+"""
 
 from pygame.locals import *
 from random import randint
@@ -9,189 +12,162 @@ import pygame
 import time
 import numpy as np
 
-class Player:
-    x = []
-    y = []
-    dx = 0
-    dy = 0
-    angle = 0
-    direction = 0
-    speed = 5
 
-    
-    
-    def __init__(self,x,y):
-        self.x = [x]
-        self.y = [y]
-        pass
+############### MQTT CODE, RETURNS p1_position, p2_position, read1, ready2
+import paho.mqtt.client as paho
+session = "jr_mints"
+BROKER = "mqtt.eclipse.org"
+qos = 0
+mqtt = paho.Client()
+mqtt.connect(BROKER, 1883)
 
-    def update(self):
-        
-        # update position of head of snake
-        if self.direction == 0 and (self.x[0] < windowWidth):
-            self.angle = 0
-        elif self.direction == 1 and (self.x[0] > 0):
-            self.angle = np.pi
-        elif self.direction == 2 and (self.y[0] > 0):
-            self.angle = 1.5*np.pi
-        elif self.direction == 3 and (self.y[0] < windowHeight):
-            self.angle = 0.5*np.pi
-        
-        self.dx = self.speed * np.cos(self.angle)
-        self.dy = self.speed * np.sin(self.angle)
-        if self.x[0] > windowWidth or self.x[0] < 0:
-            self.dx = 0
-        if self.y[0] > windowHeight or self.y[0] < 0:
-            self.dy = 0
-        
-        self.x = np.append([self.x[0] + self.dx],self.x)
-        self.y = np.append([self.y[0] + self.dy],self.y)
+p1_position = []
+p2_position = []
+gamestate = 0
+ready1 = 0
+ready2 = 0
 
+def player_reader(c, u, message):
+    global p1_position,p2_position
+    msg = message.payload.decode('ascii')
+    positions = [ float(x) for x in msg.split(',') ]
+    p1_position = [positions[0],positions[1]]
+    p2_position = [positions[2],positions[3]]
+    
+def gamestate_reader(c,u,message):
+    global gamestate, ready1, ready2
+    msg = message.payload.decode('ascii')
+    gamestate_data = [ int(x) for x in msg.split(',') ]
+    gamestate = gamestate_data[0]
+    ready1 = gamestate_data[1]
+    ready2 = gamestate_data[2]
+    
+players_topic = "{}/final/players".format(session, qos)
+mqtt.subscribe(players_topic)
+mqtt.message_callback_add(players_topic, player_reader)
 
-    def moveRight(self):
-        self.direction = 0
-    
-    def moveLeft(self):
-        self.direction = 1
-    
-    def moveUp(self):
-        self.direction = 2
-    
-    def moveDown(self):
-        self.direction = 3
-    
-    def draw(self, surface, image):
-        surface.blit(image,(self.x[0],self.y[0]))
+gamestate_topic = "{}/final/gamestate".format(session, qos)
+mqtt.subscribe(gamestate_topic)
+mqtt.message_callback_add(gamestate_topic, gamestate_reader)
+mqtt.loop_start()
 
-class Game:
-    def isCollision(self,x1,y1,x2,y2,bsize):
-        if x1 >= x2 and x1 <= x2 + bsize:
-            if y1 >= y2 and y1 <= y2 + bsize:
-                return True
-        return False
-
-class App:
-    
-    global windowWidth
-    global windowHeight
-    player = 0
-    apple = 0
-    collision_threshhold = 4
-    
-    def __init__(self):
-        self._running = True
-        self._display_surf = None
-        self._image1_surf = None
-        self.image2_surf = None
-        self._apple_surf = None
-        self.textSurface = None
-        self.TextRect = None
-        self.game = Game()
-        self.player1 = Player(100,100)
-        self.player2 = Player(100,400)
-    
-    def on_init(self):
-        pygame.init()
-        self._display_surf = pygame.display.set_mode((windowWidth,windowHeight), pygame.HWSURFACE)
-        
-        pygame.display.set_caption('Jr. Mints ME 100')
-        self._running = True
-        self._image1_surf = pygame.image.load("red.jpg").convert()
-        self._image2_surf = pygame.image.load("blue.jpg").convert()
-
-    def on_event(self, event):
-        if event.type == QUIT:
-            self._running = False
-
-    def on_loop(self):
-        self.player1.update()
-        self.player2.update()
-    
-        for i in range(1,len(self.player1.x),1):
-            #print(np.abs(self.player1.x[0] - self.player1.x[i]) + np.abs(self.player1.y[0] - self.player1.y[i]) < self.collision_threshhold)
-            if np.abs(self.player1.x[0] - self.player1.x[i]) + np.abs(self.player1.y[0] - self.player1.y[i]) < self.collision_threshhold or \
-                np.abs(self.player1.x[0] - self.player2.x[i]) + np.abs(self.player1.y[0] - self.player2.y[i]) < self.collision_threshhold:
-                self.player1.speed = 0
-                self.player2.speed = 0
-                self.on_menu(0)
-            if np.abs(self.player2.x[0] - self.player1.x[i]) + np.abs(self.player2.y[0] - self.player1.y[i]) < self.collision_threshhold or \
-                np.abs(self.player2.x[0] - self.player2.x[i]) + np.abs(self.player2.y[0] - self.player2.y[i]) < self.collision_threshhold:
-                self.player1.speed = 0
-                self.player2.speed = 0
-                self.on_menu(1)
-        
-    def on_menu(self, winner):
-        self._display_surf.fill((0,0,0))
-        
-        font = pygame.font.Font('freesansbold.ttf', 32)
-        self.textSurface = font.render('Press ENTER to start new game', True, (0,255,0))
-        self.TextRect = self.textSurface.get_rect()
-        self.TextRect.center = ((windowWidth//2),(windowHeight//2))
-        self._display_surf.blit(self.textSurface, self.TextRect)
-    
-        if winner == 1:
-            self.winnerTextSurface = font.render('Red wins!',True,(255,0,0))
-        else:
-            self.winnerTextSurface = font.render('Blue wins!',True,(0,0,255))
-        self.winnerTextRect = self.winnerTextSurface.get_rect()
-        self.winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
-        self._display_surf.blit(self.winnerTextSurface, self.winnerTextRect)
-    
-    def on_restart(self):
-        self._display_surf.fill((0,0,0))
-        self.player1 = Player(100,100)
-        self.player2 = Player(100,400)
-    
-    def on_render(self):
-        self.player1.draw(self._display_surf, self._image1_surf)
-        self.player2.draw(self._display_surf, self._image2_surf)
-
-        pygame.display.flip()
-    
-    def on_cleanup(self):
-        pygame.quit()
-    
-    def on_execute(self):
-        if self.on_init() == False:
-            self._running = False
-        
-        self.on_menu
-        while( self._running ):
-            pygame.event.pump()
-            keys = pygame.key.get_pressed()
-            
-            if (keys[K_RIGHT]):
-                self.player1.moveRight()
-            if (keys[K_LEFT]):
-                self.player1.moveLeft()
-            if (keys[K_UP]):
-                self.player1.moveUp()
-            if (keys[K_DOWN]):
-                self.player1.moveDown()
-            if (keys[K_d]):
-                self.player2.moveRight()
-            if (keys[K_a]):
-                self.player2.moveLeft()
-            if (keys[K_w]):
-                self.player2.moveUp()
-            if (keys[K_s]):
-                self.player2.moveDown()
-
-            if (keys[K_RETURN]):
-                self.on_restart()
-            
-            if (keys[K_ESCAPE]):
-                self._running = False
-            
-            self.on_loop()
-            self.on_render()
-            
-            time.sleep (20 / 1000.0);
-        self.on_cleanup()
+############# END OF MQTT #################
 
 
+############ GAME SETUP ################
 windowWidth = 800
 windowHeight = 600
-if __name__ == "__main__" :
-    theApp = App()
-    theApp.on_execute()
+
+pygame.init()
+display_surf = pygame.display.set_mode((windowWidth, windowHeight), pygame.HWSURFACE)
+pygame.display.set_caption('Jr. Mints ME 100')
+font = pygame.font.Font('freesansbold.ttf', 32)
+
+######################################
+
+############ LOGIC LOOP ##################
+
+while True:
+    if gamestate == 0:
+        display_surf.fill((0,0,0))
+        
+        ready1 = font.render('Waiting...',True,(255,0,0))
+        ready1TextRect = ready1.get_rect()
+        ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready1, ready1TextRect)
+        
+        ready2 = font.render('Waiting...',True,(0,0,255))
+        ready2TextRect = ready2.get_rect()
+        pygame.display.flip()
+        ready2TextRect.center = ((3*windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready2, ready2TextRect)
+        
+        pygame.display.flip()        
+        
+        while gamestate == 1:
+            if ready1 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
+                ready1 = font.render('Ready',True,(255,0,0))
+                display_surf.blit(ready1, ready1TextRect)                
+            if ready2 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready2TextRect)
+                ready2 = font.render('Ready',True,(0,0,255))
+                display_surf.blit(ready2, ready2TextRect)                
+            time.sleep(5/1000)
+    elif gamestate == 1:
+        display_surf.fill((0,0,0))
+        
+        winnerTextSurface = font.render('Red wins!',True,(255,0,0))
+        winnerTextRect = winnerTextSurface.get_rect()
+        winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
+        display_surf.blit(winnerTextSurface, winnerTextRect)
+        
+        ready1 = font.render('Waiting...',True,(255,0,0))
+        ready1TextRect = ready1.get_rect()
+        ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready1, ready1TextRect)
+        
+        ready2 = font.render('Waiting...',True,(0,0,255))
+        ready2TextRect = ready2.get_rect()
+        pygame.display.flip()
+        ready2TextRect.center = ((3*windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready2, ready2TextRect)
+        pygame.display.flip()
+        
+        while gamestate == 1:
+            if ready1 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
+                ready1 = font.render('Ready',True,(255,0,0))
+                display_surf.blit(ready1, ready1TextRect)                
+            if ready2 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready2TextRect)
+                ready2 = font.render('Ready',True,(0,0,255))
+                display_surf.blit(ready2, ready2TextRect)                
+            time.sleep(5/1000)
+    elif gamestate == 2:
+        display_surf.fill((0,0,0))
+        
+        winnerTextSurface = font.render('Blue wins!',True,(0,0,255))
+        winnerTextRect = winnerTextSurface.get_rect()
+        winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
+        display_surf.blit(winnerTextSurface, winnerTextRect)
+        
+        ready1 = font.render('Waiting...',True,(255,0,0))
+        ready1TextRect = ready1.get_rect()
+        ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready1, ready1TextRect)
+        
+        ready2 = font.render('Waiting...',True,(0,0,255))
+        ready2TextRect = ready2.get_rect()
+        pygame.display.flip()
+        ready2TextRect.center = ((3*windowWidth//4),(3*windowHeight//4))
+        display_surf.blit(ready2, ready2TextRect)
+        pygame.display.flip()        
+        
+        while gamestate == 2:
+            if ready1 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
+                ready1 = font.render('Ready',True,(255,0,0))
+                display_surf.blit(ready1, ready1TextRect)                
+            if ready2 == 1:
+                pygame.draw.rect(display_surf,(0,0,0),ready2TextRect)
+                ready2 = font.render('Ready',True,(0,0,255))
+                display_surf.blit(ready2, ready2TextRect)                
+            time.sleep(5/1000)
+    elif gamestate == 3:
+        display_surf.fill((0,0,0))
+        while gamestate == 3:
+            draw.circle(display_surf, (255,0,0), (p1_position[0],p1_position[1]), 2)
+            draw.circle(display_surf, (0,0,255), (p2_position[0],p2_position[1]), 2)
+    #        image1_surf = pygame.image.load("red.jpg").convert()
+    #        image2_surf = pygame.image.load("blue.jpg").convert()
+    #        App._display_surf.blit(image1,(p1[0],p1[1]))
+    #        App._display_surf.blit(image1,(p2[0],p2[1]))
+        time.sleep(5/1000)
+   
+    pygame.event.pump()
+    keys = pygame.key.get_pressed()
+    if (keys[K_ESCAPE]):
+        mqtt.loop_stop()
+        pygame.quit()
+############# END OF LOGIC LOOP ###############
