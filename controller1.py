@@ -72,15 +72,20 @@ else:
 
 ############# IMU STUFF #################
 from bno055_base import BNO055_BASE
+import numpy as np
 
 i2c = machine.I2C(-1, scl=machine.Pin(2), sda=machine.Pin(0))
 imu = BNO055_BASE(i2c)
 time.sleep(0.5)
 print(imu.euler())
+orientation = imu.euler()
+pitch = np.radians(orientation[1])
+roll = np.radians(orientation[2])
+
+angle = np.atan(np.sin(pitch)/np.sin(roll))
 
 button = Pin(A21, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
 
-angle = 0 ##### angle of tilt calculated from the IMU, between 0 and 2pi
 ready = 0   ##### ready to play
 
 
