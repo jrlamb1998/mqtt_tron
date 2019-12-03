@@ -66,7 +66,7 @@ if rtc.synced():
     print(time.strftime("%c", time.localtime()))
 else:
     print("could not get NTP time")
-    
+
 ######################################################
 
 
@@ -81,10 +81,7 @@ time.sleep(0.5)
 #print(imu.euler())
 
 
-#pitch = np.radians(orientation[1])
-#roll = np.radians(orientation[2])
-#
-#angle = np.arctan2(np.sin(pitch)/np.sin(roll))
+
 
 button = Pin(A21, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
 
@@ -111,8 +108,8 @@ def mqtt_callback(topic, msg):
     gamestate = [int(x) for x in message.split(',')]
     if gamestate[0] == 3:
         ready = 0
-    
-    
+
+
 # Set callback function
 mqtt.set_callback(mqtt_callback)
 # Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
