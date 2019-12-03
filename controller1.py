@@ -71,18 +71,20 @@ else:
 
 
 ############# IMU STUFF #################
-from bno055_base import BNO055_BASE
-import numpy as np
+#from bno055_base import BNO055_BASE
+from bno055 import *
+from board import SDA, SCL
 
-i2c = machine.I2C(-1, scl=machine.Pin(2), sda=machine.Pin(0))
-imu = BNO055_BASE(i2c)
+i2c = machine.I2C(0, scl=machine.Pin(SCL), sda=machine.Pin(SDA), freq=12500)
+imu = BNO055(i2c)
 time.sleep(0.5)
-print(imu.euler())
-orientation = imu.euler()
-pitch = np.radians(orientation[1])
-roll = np.radians(orientation[2])
+#print(imu.euler())
 
-angle = np.arctan2(np.sin(pitch)/np.sin(roll))
+
+#pitch = np.radians(orientation[1])
+#roll = np.radians(orientation[2])
+#
+#angle = np.arctan2(np.sin(pitch)/np.sin(roll))
 
 button = Pin(A21, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
 
@@ -122,6 +124,10 @@ mqtt.subscribe(session + "/final/gamestate")
 while True:
     if ready == 0:
         ready = button()
-    data = str(angle) + "," + str(ready)
+    orientation = imu.euler()
+    pitch = str(orientation[1])
+    roll = str(orientation[2])
+    print(pitch,roll)
+    data = pitch + ',' + roll + "," + str(ready)
     mqtt.publish(controller_topic, data)
     time.sleep(25/1000)
