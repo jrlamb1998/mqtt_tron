@@ -100,6 +100,23 @@ controller_topic = "{}/final/controller1".format(session)
 
 ####################################
 
+################ MQTT GAMESTATE DOWNLOAD ###############
+# Define function to execute when a message is recieved on a subscribed topic.
+def mqtt_callback(topic, msg):
+    global ready
+    global gamestate
+    message = msg.decode('utf-8')
+    gamestate = [int(x) for x in message.split(',')]
+    if gamestate[0] == 3:
+        ready = 0
+    
+    
+# Set callback function
+mqtt.set_callback(mqtt_callback)
+# Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
+mqtt.subscribe(session + "/final/gamestate")
+
+
 ############## LOGIC LOOP ###########
 
 while True:
