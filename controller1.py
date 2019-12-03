@@ -82,7 +82,7 @@ orientation = imu.euler()
 pitch = np.radians(orientation[1])
 roll = np.radians(orientation[2])
 
-angle = np.atan(np.sin(pitch)/np.sin(roll))
+angle = np.arctan2(np.sin(pitch)/np.sin(roll))
 
 button = Pin(A21, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
 
