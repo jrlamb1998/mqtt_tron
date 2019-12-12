@@ -69,7 +69,6 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 
 while True:
     if gamestate == 0:
-        print('gamestate = 0')
         display_surf.fill((0,0,0))
         
         ready1text = font.render('Waiting...',True,(255,215,0))
@@ -84,15 +83,12 @@ while True:
         
         pygame.display.flip()        
         
-        print(type(ready1))
         while gamestate == 0:
             if ready1 == 1:
-                print('ready1')
                 pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
                 ready1text = font.render('Ready',True,(255,215,0))
                 display_surf.blit(ready1text, ready1TextRect)                
             if ready2 == 1:
-                print('ready2')
                 pygame.draw.rect(display_surf,(0,0,0),ready2TextRect)
                 ready2text = font.render('Ready',True,(0,0,255))
                 display_surf.blit(ready2text, ready2TextRect)
@@ -104,7 +100,6 @@ while True:
             pygame.display.flip()
             time.sleep(25/1000)
     elif gamestate == 1:
-        print('gamestate = 1')
         display_surf.fill((0,0,0))
         
         winnerTextSurface = font.render('Red wins!',True,(255,215,0))
@@ -112,7 +107,7 @@ while True:
         winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
         display_surf.blit(winnerTextSurface, winnerTextRect)
         
-        ready1text = font.render('Waiting...',True,(255,0,0))
+        ready1text = font.render('Waiting...',True,(255,215,0))
         ready1TextRect = ready1text.get_rect()
         ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
         display_surf.blit(ready1text, ready1TextRect)
@@ -123,11 +118,10 @@ while True:
         display_surf.blit(ready2text, ready2TextRect)
         pygame.display.flip()
         
-        print(ready1)
         while gamestate == 1:
             if ready1 == 1:
                 pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
-                ready1text = font.render('Ready',True,(255,0,0))
+                ready1text = font.render('Ready',True,(255,215,0))
                 ready1TextRect = ready1text.get_rect()
                 ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
                 display_surf.blit(ready1text, ready1TextRect)
@@ -143,7 +137,6 @@ while True:
             pygame.display.flip()
             time.sleep(25/1000)
     elif gamestate == 2:
-        print('gamestate = 2')
         display_surf.fill((0,0,0))
         
         winnerTextSurface = font.render('Blue wins!',True,(0,0,255))
@@ -151,7 +144,7 @@ while True:
         winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
         display_surf.blit(winnerTextSurface, winnerTextRect)
         
-        ready1text = font.render('Waiting...',True,(255,0,0))
+        ready1text = font.render('Waiting...',True,(255,215,0))
         ready1TextRect = ready1text.get_rect()
         ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
         display_surf.blit(ready1text, ready1TextRect)
@@ -165,7 +158,7 @@ while True:
         while gamestate == 2:
             if ready1 == 1:
                 pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
-                ready1text = font.render('Ready',True,(255,0,0))
+                ready1text = font.render('Ready',True,(255,215,0))
                 display_surf.blit(ready1text, ready1TextRect)                
             if ready2 == 1:
                 pygame.draw.rect(display_surf,(0,0,0),ready2TextRect)
@@ -180,10 +173,9 @@ while True:
             time.sleep(25/1000)
             
     elif gamestate == 3:
-        print('gamestate = 1')
         display_surf.fill((0,0,0))
         while gamestate == 3:
-            draw.circle(display_surf, (255,0,0), (p1_position[0],p1_position[1]), 2)
+            draw.circle(display_surf, (255,215,0), (p1_position[0],p1_position[1]), 2)
             draw.circle(display_surf, (0,0,255), (p2_position[0],p2_position[1]), 2)
     #        image1_surf = pygame.image.load("red.jpg").convert()
     #        image2_surf = pygame.image.load("blue.jpg").convert()
