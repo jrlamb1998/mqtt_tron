@@ -65,11 +65,12 @@ while True:
         ############ Calculate positions
         pitch1 = np.radians(data1[0])
         roll1 = np.radians(data1[1])
-        angle1 = np.arctan2(np.sin(pitch1),np.sin(roll1))
+        angle1 = np.arctan2(np.sin(roll1),np.sin(pitch1))
         
-        pitch2 = np.radians(data1[0])
-        roll2 = np.radians(data1[1])
-        angle2 = np.arctan2(np.sin(pitch2),np.sin(roll2))
+        pitch2 = np.radians(data2[0])
+        roll2 = np.radians(data2[1])
+        
+        angle2 = np.arctan2(np.sin(roll2), np.sin(pitch2))
         
         x1 += speed * np.cos(angle1)
         y1 += speed * np.sin(angle1)
@@ -98,17 +99,17 @@ while True:
     ### check for collisions 
         for i in range(len(player2_list)):
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
-            if distance <= 0.5*speed:
+            if distance <= 0.9*float(speed):
                 gamestate = 2
-                player1_list = np.array([0,0])
-                player2_list = np.array([0,0])
+                player1_list = np.array([[0,0],[0,0]])
+                player2_list = np.array([[0,0],[0,0]])
                 
         for i in range(len(player1_list)):
             distance = np.sqrt( (player1_list[i,0]-x2)**2 + (player1_list[i,1] - y2)**2)
             if distance <= 0.9*speed:
                 gamestate = 1
-                player1_list = np.array([0,0])
-                player2_list = np.array([0,0])
+                player1_list = np.array([[0,0],[0,0]])
+                player2_list = np.array([[0,0],[0,0]])
         
         player1_list = np.vstack((player1_list,[x1,y1]))
         player2_list = np.vstack((player2_list,[x2,y2]))
@@ -116,7 +117,7 @@ while True:
         
     
     gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
-    players_data = str(int(x1)) + "," + str(int(y2)) + "," + str(int(x2)) + "," + str(int(y2))
+    players_data = str(int(x1)) + "," + str(int(y1)) + "," + str(int(x2)) + "," + str(int(y2))
     mqtt.publish(gamestate_topic, gamestate_data, qos)
     mqtt.publish(players_topic, players_data, qos)
     time.sleep(100/1000)
