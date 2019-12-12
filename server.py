@@ -1,5 +1,7 @@
-############# DOWNLOAD TO SERVER #####################
+############# DOWNLOAD FROM SERVER #####################
 
+import time
+import numpy as np
 import paho.mqtt.client as paho
 session = "jr_mints"
 BROKER = "mqtt.eclipse.org"
@@ -7,15 +9,29 @@ qos = 0
 mqtt = paho.Client()
 mqtt.connect(BROKER, 1883)
 
+data1 = [0,0,0]
+data2 = [0,0,0]
+ready1 = 0
+ready2 = 0
+gamestate = 0
+speed = 5.
+x1 = 100.
+y1 = 100.
+x2 = 100.
+y2 = 400.
+
+player1_list = np.array([x1,y1])
+player2_list = np.array([x2,y2])
+
 def controller1_reader(c, u, message):
+    global data1 ### data has the fields [pitch,roll,ready]
     msg = message.payload.decode('ascii')
-    data = [ float(x) for x in msg.split(',') ]
-    return data  #### data has the fields [angle1, ready1]
+    data1 = [ float(x) for x in msg.split(',') ]
 
 def controller2_reader(c, u, message):
+    global data2  #### data has the fields [pitch,roll,ready]
     msg = message.payload.decode('ascii')
-    data = [ float(x) for x in msg.split(',') ]
-    return data  #### data has the fields [angle2, ready2]
+    data2 = [ float(x) for x in msg.split(',') ]
 
 controller1_topic = "{}/final/controller1".format(session, qos)
 controller2_topic = "{}/final/controller2".format(session, qos)
@@ -24,36 +40,59 @@ mqtt.subscribe(controller2_topic)
 
 mqtt.message_callback_add(controller1_topic, controller1_reader)
 mqtt.message_callback_add(controller2_topic, controller2_reader)
-mqtt.loop_forever()
+mqtt.loop_start()
+print('hello')
 
-############# UPLOAD FROM SERVER #####################
-
-import paho.mqtt.client as paho
-session = "jr_mints"
-BROKER = "mqtt.eclipse.org"
-qos = 0
-mqtt = paho.Client()
-mqtt.connect(BROKER, 1883)
+############# UPLOAD TO SERVER #####################
 gamestate_topic = "{}/final/gamestate".format(session)
 players_topic = "{}/final/players".format(session)
 
+while True:
+    ############ Calculate positions
+    pitch1 = np.radians(data1[0])
+    roll1 = np.radians(data1[1])
+    angle1 = np.arctan2(np.sin(pitch1),np.sin(roll1))
+    
+    pitch2 = np.radians(data1[0])
+    roll2 = np.radians(data1[1])
+    angle2 = np.arctan2(np.sin(pitch2),np.sin(roll2))
+    
+    x1 += speed * np.cos(angle1)
+    y1 += speed * np.sin(angle1)
+    x2 += speed * np.cos(angle2)
+    y2 += speed * np.sin(angle2)
+    
+    player1_list = np.vstack((player1_list,[x1,y1]))
+    player2_list = np.vstack((player2_list,[x2,y2]))
+    
+    ########### Calculate gamestate
+    ready1_old = ready1
+    ready2_old = ready2
+    
+    ready1 = data1[2]
+    ready2 = data2[2]
+    
+    ### Start the game
+    if not (ready1_old and ready2_old):
+        if ready1 and ready2:
+            gamestate = 3
+    
+    ### check for collisions        
+    if gamestate == 3:
+        for i in range(len(player2_list)):
+            distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
+            if distance <= 0.9*speed:
+                gamestate = 2
+        for i in range(len(player1_list)):
+            distance = np.sqrt( (player1_list[i,0]-x2)**2 + (player1_list[i,1] - y2)**2)
+            if distance <= 0.9*speed:
+                gamestate = 1
+        
+    
+    gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
+    players_data = str(x1) + "," + str(y2) + "," + str(x2) + "," + str(y2)
+    mqtt.publish(gamestate_topic, gamestate_data, qos)
+    mqtt.publish(players_topic, players_data, qos)
+    time.sleep(5/1000)
 
-gamestate = 1   #example - player 1 wins
-ready1 = 0
-ready2 = 1
 
-x1, y1, x2, y2 = [20,30,40,50]  # example
-gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
-players_data = str(x1) + "," + str(y2) + "," + str(x2) + "," + str(y2)
-mqtt.publish(gamestate_topic, gamestate_data, qos)
-mqtt.publish(players_topic, players_data, qos)
-
-
-
-"""
-controller numpy stuff to find radians and change player direction
-"""
-pitch = np.radians(orientation[1])
-roll = np.radians(orientation[2])
-
-angle = np.arctan2(np.sin(pitch)/np.sin(roll))
