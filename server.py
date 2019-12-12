@@ -48,22 +48,6 @@ gamestate_topic = "{}/final/gamestate".format(session)
 players_topic = "{}/final/players".format(session)
 
 while True:
-    ############ Calculate positions
-    pitch1 = np.radians(data1[0])
-    roll1 = np.radians(data1[1])
-    angle1 = np.arctan2(np.sin(pitch1),np.sin(roll1))
-    
-    pitch2 = np.radians(data1[0])
-    roll2 = np.radians(data1[1])
-    angle2 = np.arctan2(np.sin(pitch2),np.sin(roll2))
-    
-    x1 += speed * np.cos(angle1)
-    y1 += speed * np.sin(angle1)
-    x2 += speed * np.cos(angle2)
-    y2 += speed * np.sin(angle2)
-    
-    player1_list = np.vstack((player1_list,[x1,y1]))
-    player2_list = np.vstack((player2_list,[x2,y2]))
     
     ########### Calculate gamestate
     ready1_old = ready1
@@ -76,9 +60,43 @@ while True:
     if not (ready1_old and ready2_old):
         if ready1 and ready2:
             gamestate = 3
-    
-    ### check for collisions        
+         
     if gamestate == 3:
+        
+        ############ Calculate positions
+        pitch1 = np.radians(data1[0])
+        roll1 = np.radians(data1[1])
+        angle1 = np.arctan2(np.sin(pitch1),np.sin(roll1))
+        
+        pitch2 = np.radians(data1[0])
+        roll2 = np.radians(data1[1])
+        angle2 = np.arctan2(np.sin(pitch2),np.sin(roll2))
+        
+        x1 += speed * np.cos(angle1)
+        y1 += speed * np.sin(angle1)
+        x2 += speed * np.cos(angle2)
+        y2 += speed * np.sin(angle2)
+        
+    ### Check for edge
+        if x1 > 800:
+            x1 = 800
+        if x2 > 800:
+            x2 = 800
+        if y1 > 600:
+            y1 = 600
+        if y2 > 600:
+            y2 = 600
+            
+        if x1 < 0:
+            x1 = 0
+        if x2 < 0:
+            x2 = 0
+        if y1 < 0:
+            x2 = 0
+        if y2 < 0:
+            y2 = 0
+
+    ### check for collisions 
         for i in range(len(player2_list)):
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
             if distance <= 0.9*speed:
@@ -92,6 +110,10 @@ while True:
                 gamestate = 1
                 player1_list = np.array([0,0])
                 player2_list = np.array([0,0])
+        
+        player1_list = np.vstack((player1_list,[x1,y1]))
+        player2_list = np.vstack((player2_list,[x2,y2]))
+        
         
     
     gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
