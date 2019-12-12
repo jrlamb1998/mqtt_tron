@@ -23,9 +23,9 @@ mqtt.connect(BROKER, 1883)
 
 p1_position = []
 p2_position = []
-gamestate = 1
+gamestate = 2
 ready1 = 1
-ready2 = 0
+ready2 = 1
 
 def player_reader(c, u, message):
     global p1_position,p2_position

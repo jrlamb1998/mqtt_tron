@@ -69,8 +69,8 @@ while True:
     ready1_old = ready1
     ready2_old = ready2
     
-    ready1 = data1[2]
-    ready2 = data2[2]
+    ready1 = int(data1[2])
+    ready2 = int(data2[2])
     
     ### Start the game
     if not (ready1_old and ready2_old):
@@ -98,4 +98,4 @@ while True:
     players_data = str(x1) + "," + str(y2) + "," + str(x2) + "," + str(y2)
     mqtt.publish(gamestate_topic, gamestate_data, qos)
     mqtt.publish(players_topic, players_data, qos)
-    time.sleep(5/1000)
+    time.sleep(50/1000)
