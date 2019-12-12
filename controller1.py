@@ -126,7 +126,7 @@ while True:
     roll = str(orientation[2])
     #print(pitch,roll,ready)
     mqtt.check_msg()
-    print(gamestate)
+    #print(gamestate)
     data = pitch + ',' + roll + "," + str(ready)
     mqtt.publish(controller_topic, data)
     time.sleep(25/1000)
