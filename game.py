@@ -30,7 +30,7 @@ ready2 = 1
 def player_reader(c, u, message):
     global p1_position,p2_position
     msg = message.payload.decode('ascii')
-    positions = [ float(x) for x in msg.split(',') ]
+    positions = [ int(x) for x in msg.split(',') ]
     p1_position = [positions[0],positions[1]]
     p2_position = [positions[2],positions[3]]
     
