@@ -175,8 +175,8 @@ while True:
     elif gamestate == 3:
         display_surf.fill((0,0,0))
         while gamestate == 3:
-            draw.circle(display_surf, (255,215,0), (p1_position[0],p1_position[1]), 2)
-            draw.circle(display_surf, (0,0,255), (p2_position[0],p2_position[1]), 2)
+            pygame.draw.circle(display_surf, (255,215,0), (p1_position[0],p1_position[1]), 2)
+            pygame.draw.circle(display_surf, (0,0,255), (p2_position[0],p2_position[1]), 2)
     #        image1_surf = pygame.image.load("red.jpg").convert()
     #        image2_surf = pygame.image.load("blue.jpg").convert()
     #        App._display_surf.blit(image1,(p1[0],p1[1]))
