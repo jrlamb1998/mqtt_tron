@@ -83,10 +83,15 @@ while True:
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
             if distance <= 0.9*speed:
                 gamestate = 2
+                player1_list = np.array([0,0])
+                player2_list = np.array([0,0])
+                
         for i in range(len(player1_list)):
             distance = np.sqrt( (player1_list[i,0]-x2)**2 + (player1_list[i,1] - y2)**2)
             if distance <= 0.9*speed:
                 gamestate = 1
+                player1_list = np.array([0,0])
+                player2_list = np.array([0,0])
         
     
     gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
@@ -94,5 +99,3 @@ while True:
     mqtt.publish(gamestate_topic, gamestate_data, qos)
     mqtt.publish(players_topic, players_data, qos)
     time.sleep(5/1000)
-
-
