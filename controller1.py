@@ -6,7 +6,6 @@ Jr Mints Final Project
 Jack Lamb and Rees Parker
 """
 
-from board import A21
 from machine import Pin
 import machine
 import time
@@ -81,11 +80,12 @@ time.sleep(0.5)
 #print(imu.euler())
 
 
+############# BUTTON PRESS  #################
+from board import A8
 
+button = Pin(A8, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
 
-button = Pin(A21, mode=Pin.IN, pull=Pin.PULL_UP, debounce=500000)
-
-ready = 0   ##### ready to play
+ready = int(0)   ##### ready to play
 
 
 ############# MQTT PUBLISH DATA #################
@@ -107,7 +107,7 @@ def mqtt_callback(topic, msg):
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
     if gamestate[0] == 3:
-        ready = 0
+        ready = int(0)
 
 
 # Set callback function
@@ -115,17 +115,18 @@ mqtt.set_callback(mqtt_callback)
 # Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
 mqtt.subscribe(session + "/final/gamestate")
 
-
 ############## LOGIC LOOP ###########
-
+gamestate = []
 while True:
     if ready == 0:
         if button() == 0:
-            ready = 1
+            ready = int(1)
     orientation = imu.euler()
     pitch = str(orientation[1])
     roll = str(orientation[2])
-    print(pitch,roll)
+    #print(pitch,roll,ready)
+    mqtt.check_msg()
+    print(gamestate)
     data = pitch + ',' + roll + "," + str(ready)
     mqtt.publish(controller_topic, data)
     time.sleep(25/1000)
