@@ -20,8 +20,8 @@ y1 = 100.
 x2 = 100.
 y2 = 400.
 
-player1_list = np.array([x1,y1])
-player2_list = np.array([x2,y2])
+player1_list = np.array([[0,0],[0,0]])
+player2_list = np.array([[0,0],[0,0]])
 
 def controller1_reader(c, u, message):
     global data1 ### data has the fields [pitch,roll,ready]
