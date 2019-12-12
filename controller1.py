@@ -120,7 +120,8 @@ mqtt.subscribe(session + "/final/gamestate")
 
 while True:
     if ready == 0:
-        ready = button()
+        if button() == 0:
+            ready = 1
     orientation = imu.euler()
     pitch = str(orientation[1])
     roll = str(orientation[2])
