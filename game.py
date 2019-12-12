@@ -72,7 +72,7 @@ while True:
         print('gamestate = 0')
         display_surf.fill((0,0,0))
         
-        ready1text = font.render('Waiting...',True,(255,0,0))
+        ready1text = font.render('Waiting...',True,(255,215,0))
         ready1TextRect = ready1text.get_rect()
         ready1TextRect.center = ((windowWidth//4),(3*windowHeight//4))
         display_surf.blit(ready1text, ready1TextRect)
@@ -89,7 +89,7 @@ while True:
             if ready1 == 1:
                 print('ready1')
                 pygame.draw.rect(display_surf,(0,0,0),ready1TextRect)
-                ready1text = font.render('Ready',True,(255,0,0))
+                ready1text = font.render('Ready',True,(255,215,0))
                 display_surf.blit(ready1text, ready1TextRect)                
             if ready2 == 1:
                 print('ready2')
@@ -107,7 +107,7 @@ while True:
         print('gamestate = 1')
         display_surf.fill((0,0,0))
         
-        winnerTextSurface = font.render('Red wins!',True,(255,0,0))
+        winnerTextSurface = font.render('Red wins!',True,(255,215,0))
         winnerTextRect = winnerTextSurface.get_rect()
         winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
         display_surf.blit(winnerTextSurface, winnerTextRect)

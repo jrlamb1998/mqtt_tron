@@ -41,7 +41,6 @@ mqtt.subscribe(controller2_topic)
 mqtt.message_callback_add(controller1_topic, controller1_reader)
 mqtt.message_callback_add(controller2_topic, controller2_reader)
 mqtt.loop_start()
-print('hello')
 
 ############# UPLOAD TO SERVER #####################
 gamestate_topic = "{}/final/gamestate".format(session)
