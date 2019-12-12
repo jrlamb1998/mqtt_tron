@@ -99,7 +99,7 @@ while True:
     ### check for collisions 
         for i in range(len(player2_list)):
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
-            if distance <= 0.9*speed:
+            if distance <= 0.5*speed:
                 gamestate = 2
                 player1_list = np.array([0,0])
                 player2_list = np.array([0,0])
@@ -117,7 +117,7 @@ while True:
         
     
     gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
-    players_data = str(x1) + "," + str(y2) + "," + str(x2) + "," + str(y2)
+    players_data = str(int(x1)) + "," + str(int(y2)) + "," + str(int(x2)) + "," + str(int(y2))
     mqtt.publish(gamestate_topic, gamestate_data, qos)
     mqtt.publish(players_topic, players_data, qos)
-    time.sleep(50/1000)
+    time.sleep(100/1000)
