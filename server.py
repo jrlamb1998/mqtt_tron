@@ -59,6 +59,10 @@ while True:
     if not (ready1_old and ready2_old):
         if ready1 and ready2:
             gamestate = 3
+            gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
+            players_data = str(int(x1)) + "," + str(int(y1)) + "," + str(int(x2)) + "," + str(int(y2))
+            mqtt.publish(gamestate_topic, gamestate_data, qos)
+            time.sleep(4)
          
     if gamestate == 3:
         ############ Calculate positions
