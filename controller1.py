@@ -6,7 +6,7 @@ Jr Mints Final Project
 Jack Lamb and Rees Parker
 """
 
-from machine import Pin
+from machine import Pin, PWM
 import machine
 import time
 
@@ -104,10 +104,13 @@ controller_topic = "{}/final/controller1".format(session)
 def mqtt_callback(topic, msg):
     global ready
     global gamestate
+    old_gamestate = gamestate[:]
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
-    if gamestate[0] == 3:
+    if (gamestate[0] == 3):
         ready = int(0)
+        if old_gamestate[0] == 0:
+            #PLAY MUSIC
 
 
 # Set callback function
