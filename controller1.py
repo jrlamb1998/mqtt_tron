@@ -146,7 +146,7 @@ mqtt.subscribe(session + "/final/gamestate")
 
 ############## LOGIC LOOP ###########
 gamestate = [0,0,0]
-old_gamestate = [3,0,0]
+old_gamestate = [5,0,0]
 while True:
     if ready == 0:
         if button() == 0:
