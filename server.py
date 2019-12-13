@@ -103,26 +103,29 @@ while True:
         for i in range(len(player2_list)):
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
             if distance <= 0.9*float(speed):
-                gamestate = 2                
+                gamestate = 2     
+                time.sleep(4)
         for i in range(len(player1_list)-1):
             distance = np.sqrt( (player1_list[i,0]-x1)**2 + (player1_list[i,1] - y1)**2)
             if distance <= 0.9*float(speed):
                 gamestate = 2
+                time.sleep(4)
                 
         for i in range(len(player1_list)):
             distance = np.sqrt( (player1_list[i,0]-x2)**2 + (player1_list[i,1] - y2)**2)
             if distance <= 0.9*speed:
                 gamestate = 1
+                time.sleep(4)
         for i in range(len(player2_list)-1):
             distance = np.sqrt( (player2_list[i,0]-x2)**2 + (player2_list[i,1] - y2)**2)
             if distance <= 0.9*speed:
                 gamestate = 1
+                time.sleep(4)
         
         player1_list = np.vstack((player1_list,[x1,y1]))
         player2_list = np.vstack((player2_list,[x2,y2]))
     
     else:
-
         x1 = 100.
         y1 = 100.
         x2 = 100.

@@ -110,7 +110,11 @@ def mqtt_callback(topic, msg):
     if (gamestate[0] == 3):
         ready = int(0)
         if old_gamestate[0] == 0:
-            #PLAY MUSIC
+            #PLAY START MUSIC
+    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
+        ###### PLAY WINNING MUSIC
+    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
+        ###### PLAY LOSING MUSIC
 
 
 # Set callback function
