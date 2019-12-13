@@ -95,7 +95,7 @@ session = "jr_mints"
 BROKER = "mqtt.eclipse.org"
 mqtt = MQTTClient(BROKER)
 
-controller_topic = "{}/final/controller1".format(session)
+controller_topic = "{}/final/controller2".format(session)
 
 ####################################
 
@@ -131,7 +131,6 @@ loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1]
 # Define function to execute when a message is recieved on a subscribed topic.
 def mqtt_callback(topic, msg):
     global ready
-    global gamestate
     old_gamestate = gamestate[:]
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
@@ -144,14 +143,14 @@ def mqtt_callback(topic, msg):
                 pwm0.freq(i)
                 time.sleep(0.2) #in seconds
             pwm0.duty(0)
-    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
+    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
         ###### PLAY WINNING MUSIC
         pwm0.duty(30)
         for i in win:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
-    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
+    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
         pwm0.duty(30)
         for i in loss:
