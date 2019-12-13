@@ -131,6 +131,8 @@ loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1]
 # Define function to execute when a message is recieved on a subscribed topic.
 def mqtt_callback(topic, msg):
     global ready
+    global gamestate
+    global old_gamestate
     old_gamestate = gamestate[:]
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
@@ -160,11 +162,12 @@ while True:
     mqtt.publish(controller_topic, data)
 
     if (gamestate[0] == 3) and (old_gamestate[0] != 3):
-            pwm0.duty(30)
-            for i in start:
-                time.sleep(0.2) #in seconds
-                pwm0.freq(i)
-            pwm0.duty(0)
+        pwm0.duty(30)
+        for i in start:
+            time.sleep(0.2) #in seconds
+            pwm0.freq(i)
+        pwm0.duty(0)
+        old_gamestate = [3,0,0]
     if (gamestate[0] == 2) and (old_gamestate[0] != 2):
         ###### PLAY WINNING MUSIC
         pwm0.duty(30)
@@ -172,6 +175,7 @@ while True:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
+        old_gamestate = [2,0,0]
     if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
         pwm0.duty(30)
@@ -179,5 +183,6 @@ while True:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
+        old_gamestate = [1,0,0]
 
     time.sleep(25/1000)
