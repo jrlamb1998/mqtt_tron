@@ -121,9 +121,9 @@ pwm0 = PWM(speaker, freq=5000, duty=0, timer = 0) #timer needed
 
 start = [E5,1,1,1,E5,1,1,1,E5,1,1,1,E6,E6,E6,E6,1]
 
-win = [C5,CS5,D5,DS5,E5,E5,E5,E5,1,1]
+win = [C5,CS5,D5,DS5,E5,E5,E5,E5,1]
 
-loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1,1]
+loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1]
 
 ####################################
 
@@ -153,7 +153,7 @@ def mqtt_callback(topic, msg):
     if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
         pwm0.duty(30)
-        for i in lose:
+        for i in loss:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
