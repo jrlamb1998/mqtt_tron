@@ -132,13 +132,35 @@ loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1]
 def mqtt_callback(topic, msg):
     global ready
     global gamestate
+    global old_gamestate
     old_gamestate = gamestate[:]
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
     if (gamestate[0] == 3):
         ready = int(0)
-        if old_gamestate[0] == 0:
-            #PLAY START MUSIC
+
+# Set callback function
+mqtt.set_callback(mqtt_callback)
+# Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
+mqtt.subscribe(session + "/final/gamestate")
+
+############## LOGIC LOOP ###########
+gamestate = []
+old_gamestate = []
+while True:
+    if ready == 0:
+        if button() == 0:
+            ready = int(1)
+    orientation = imu.euler()
+    pitch = str(orientation[1])
+    roll = str(orientation[2])
+    #print(pitch,roll,ready)
+    mqtt.check_msg()
+    #print(gamestate)
+    data = pitch + ',' + roll + "," + str(ready)
+    mqtt.publish(controller_topic, data)
+    
+    if (gamestate[0] == 3) and (old_gamestate[0] != 3):
             pwm0.duty(30)
             for i in start:
                 pwm0.freq(i)
@@ -158,25 +180,5 @@ def mqtt_callback(topic, msg):
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
-
-
-# Set callback function
-mqtt.set_callback(mqtt_callback)
-# Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
-mqtt.subscribe(session + "/final/gamestate")
-
-############## LOGIC LOOP ###########
-gamestate = []
-while True:
-    if ready == 0:
-        if button() == 0:
-            ready = int(1)
-    orientation = imu.euler()
-    pitch = str(orientation[1])
-    roll = str(orientation[2])
-    #print(pitch,roll,ready)
-    mqtt.check_msg()
-    #print(gamestate)
-    data = pitch + ',' + roll + "," + str(ready)
-    mqtt.publish(controller_topic, data)
+    
     time.sleep(25/1000)
