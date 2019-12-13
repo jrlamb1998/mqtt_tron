@@ -145,8 +145,8 @@ mqtt.set_callback(mqtt_callback)
 mqtt.subscribe(session + "/final/gamestate")
 
 ############## LOGIC LOOP ###########
-gamestate = []
-old_gamestate = []
+gamestate = [0,0,0]
+old_gamestate = [0,0,0]
 while True:
     if ready == 0:
         if button() == 0:
