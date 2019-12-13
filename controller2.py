@@ -139,7 +139,6 @@ def mqtt_callback(topic, msg):
     if (gamestate[0] == 3):
         ready = int(0)
 
-
 # Set callback function
 mqtt.set_callback(mqtt_callback)
 # Set a topic you will subscribe too. Publish to this topic via web client and watch microcontroller recieve messages.
@@ -147,7 +146,7 @@ mqtt.subscribe(session + "/final/gamestate")
 
 ############## LOGIC LOOP ###########
 gamestate = [0,0,0]
-old_gamestate = [3,0,0]
+old_gamestate = [5,0,0]
 while True:
     if ready == 0:
         if button() == 0:
@@ -176,6 +175,7 @@ while True:
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
         old_gamestate = [2,0,0]
+
     if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
         pwm0.duty(30)

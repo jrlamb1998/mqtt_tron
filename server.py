@@ -58,6 +58,9 @@ while True:
     ### Start the game
     if not (ready1_old and ready2_old):
         if ready1 and ready2:
+            gamestate_data_ready = str(gamestate) + "," + str(ready1) + "," + str(ready2)
+            mqtt.publish(gamestate_topic, gamestate_data_ready, qos)
+            time.sleep(0.5)
             gamestate = 3
             gamestate_data = str(gamestate) + "," + str(ready1) + "," + str(ready2)
             players_data = str(int(x1)) + "," + str(int(y1)) + "," + str(int(x2)) + "," + str(int(y2))
