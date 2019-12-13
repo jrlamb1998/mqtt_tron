@@ -136,27 +136,6 @@ def mqtt_callback(topic, msg):
     gamestate = [int(x) for x in message.split(',')]
     if (gamestate[0] == 3):
         ready = int(0)
-        if old_gamestate[0] == 0:
-            #PLAY START MUSIC
-            pwm0.duty(30)
-            for i in start:
-                pwm0.freq(i)
-                time.sleep(0.2) #in seconds
-            pwm0.duty(0)
-    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
-        ###### PLAY WINNING MUSIC
-        pwm0.duty(30)
-        for i in win:
-            pwm0.freq(i)
-            time.sleep(0.2) #in seconds
-        pwm0.duty(0)
-    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
-        ###### PLAY LOSING MUSIC
-        pwm0.duty(30)
-        for i in loss:
-            pwm0.freq(i)
-            time.sleep(0.2) #in seconds
-        pwm0.duty(0)
 
 
 # Set callback function
@@ -165,7 +144,8 @@ mqtt.set_callback(mqtt_callback)
 mqtt.subscribe(session + "/final/gamestate")
 
 ############## LOGIC LOOP ###########
-gamestate = []
+gamestate = [0,0,0]
+old_gamestate = [3,0,0]
 while True:
     if ready == 0:
         if button() == 0:
@@ -178,4 +158,26 @@ while True:
     #print(gamestate)
     data = pitch + ',' + roll + "," + str(ready)
     mqtt.publish(controller_topic, data)
+
+    if (gamestate[0] == 3) and (old_gamestate[0] != 3):
+            pwm0.duty(30)
+            for i in start:
+                time.sleep(0.2) #in seconds
+                pwm0.freq(i)
+            pwm0.duty(0)
+    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
+        ###### PLAY WINNING MUSIC
+        pwm0.duty(30)
+        for i in win:
+            pwm0.freq(i)
+            time.sleep(0.2) #in seconds
+        pwm0.duty(0)
+    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
+        ###### PLAY LOSING MUSIC
+        pwm0.duty(30)
+        for i in loss:
+            pwm0.freq(i)
+            time.sleep(0.2) #in seconds
+        pwm0.duty(0)
+
     time.sleep(25/1000)

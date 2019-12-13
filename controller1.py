@@ -146,7 +146,7 @@ mqtt.subscribe(session + "/final/gamestate")
 
 ############## LOGIC LOOP ###########
 gamestate = [0,0,0]
-old_gamestate = [0,0,0]
+old_gamestate = [3,0,0]
 while True:
     if ready == 0:
         if button() == 0:
@@ -159,12 +159,12 @@ while True:
     #print(gamestate)
     data = pitch + ',' + roll + "," + str(ready)
     mqtt.publish(controller_topic, data)
-    
+
     if (gamestate[0] == 3) and (old_gamestate[0] != 3):
             pwm0.duty(30)
             for i in start:
-                pwm0.freq(i)
                 time.sleep(0.2) #in seconds
+                pwm0.freq(i)
             pwm0.duty(0)
     if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY WINNING MUSIC
@@ -180,5 +180,5 @@ while True:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
-    
+
     time.sleep(25/1000)
