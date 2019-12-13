@@ -6,7 +6,7 @@ Jr Mints Final Project
 Jack Lamb and Rees Parker
 """
 
-from machine import Pin
+from machine import Pin, PWM
 import machine
 import time
 
@@ -103,11 +103,17 @@ controller_topic = "{}/final/controller2".format(session)
 # Define function to execute when a message is recieved on a subscribed topic.
 def mqtt_callback(topic, msg):
     global ready
-    global gamestate
+    old_gamestate = gamestate[:]
     message = msg.decode('utf-8')
     gamestate = [int(x) for x in message.split(',')]
-    if gamestate[0] == 3:
+    if (gamestate[0] == 3):
         ready = int(0)
+        if old_gamestate[0] == 0:
+            #PLAY START MUSIC
+    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
+        ###### PLAY WINNING MUSIC
+    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
+        ###### PLAY LOSING MUSIC
 
 
 # Set callback function
