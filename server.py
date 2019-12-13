@@ -61,7 +61,6 @@ while True:
             gamestate = 3
          
     if gamestate == 3:
-        
         ############ Calculate positions
         pitch1 = np.radians(data1[0])
         roll1 = np.radians(data1[1])
@@ -100,19 +99,32 @@ while True:
         for i in range(len(player2_list)):
             distance = np.sqrt( (player2_list[i,0]-x1)**2 + (player2_list[i,1] - y1)**2)
             if distance <= 0.9*float(speed):
+                gamestate = 2                
+        for i in range(len(player1_list)-1):
+            distance = np.sqrt( (player1_list[i,0]-x1)**2 + (player1_list[i,1] - y1)**2)
+            if distance <= 0.9*float(speed):
                 gamestate = 2
-                player1_list = np.array([[0,0],[0,0]])
-                player2_list = np.array([[0,0],[0,0]])
                 
         for i in range(len(player1_list)):
             distance = np.sqrt( (player1_list[i,0]-x2)**2 + (player1_list[i,1] - y2)**2)
             if distance <= 0.9*speed:
                 gamestate = 1
-                player1_list = np.array([[0,0],[0,0]])
-                player2_list = np.array([[0,0],[0,0]])
+        for i in range(len(player2_list)-1):
+            distance = np.sqrt( (player2_list[i,0]-x2)**2 + (player2_list[i,1] - y2)**2)
+            if distance <= 0.9*speed:
+                gamestate = 1
         
         player1_list = np.vstack((player1_list,[x1,y1]))
         player2_list = np.vstack((player2_list,[x2,y2]))
+    
+    else:
+
+        x1 = 100.
+        y1 = 100.
+        x2 = 100.
+        y2 = 400.
+        player1_list = np.array([[0,0],[0,0]])
+        player2_list = np.array([[0,0],[0,0]])
         
         
     

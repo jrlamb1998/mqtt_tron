@@ -102,7 +102,7 @@ while True:
     elif gamestate == 1:
         display_surf.fill((0,0,0))
 
-        winnerTextSurface = font.render('Red wins!',True,(255,215,0))
+        winnerTextSurface = font.render('Gold wins!',True,(255,215,0))
         winnerTextRect = winnerTextSurface.get_rect()
         winnerTextRect.center = ((windowWidth//2),(windowHeight//4))
         display_surf.blit(winnerTextSurface, winnerTextRect)
@@ -177,10 +177,6 @@ while True:
         while gamestate == 3:
             pygame.draw.circle(display_surf, (255,215,0), (p1_position[0],p1_position[1]), 5)
             pygame.draw.circle(display_surf, (0,0,255), (p2_position[0],p2_position[1]), 5)
-    #        image1_surf = pygame.image.load("red.jpg").convert()
-    #        image2_surf = pygame.image.load("blue.jpg").convert()
-    #        App._display_surf.blit(image1,(p1[0],p1[1]))
-    #        App._display_surf.blit(image1,(p2[0],p2[1]))
             pygame.event.pump()
             keys = pygame.key.get_pressed()
             if (keys[K_ESCAPE]):
