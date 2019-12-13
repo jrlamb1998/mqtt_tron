@@ -165,14 +165,14 @@ while True:
                 time.sleep(0.2) #in seconds
                 pwm0.freq(i)
             pwm0.duty(0)
-    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
+    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
         ###### PLAY WINNING MUSIC
         pwm0.duty(30)
         for i in win:
             pwm0.freq(i)
             time.sleep(0.2) #in seconds
         pwm0.duty(0)
-    if (gamestate[0] == 2) and (old_gamestate[0] != 2):
+    if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
         pwm0.duty(30)
         for i in loss:
