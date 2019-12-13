@@ -99,6 +99,34 @@ controller_topic = "{}/final/controller2".format(session)
 
 ####################################
 
+################ TONES ################
+
+C3 = 131
+CS3 = 139
+D3 = 147
+DS3 = 156
+E3 = 165
+C5 = 523
+CS5 = 554
+D5 = 587
+DS5 = 622
+E5 = 659
+E6 = 1319
+
+from board import A10
+
+speaker = Pin(A10, mode=Pin.OUT) #may need to be switched to OUT_OD
+
+pwm0 = PWM(speaker, freq=5000, duty=0, timer = 0) #timer needed
+
+start = [E5,1,1,1,E5,1,1,1,E5,1,1,1,E6,E6,E6,E6,1]
+
+win = [C5,CS5,D5,DS5,E5,E5,E5,E5,1,1]
+
+loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1,1]
+
+####################################
+
 ################ MQTT GAMESTATE DOWNLOAD ###############
 # Define function to execute when a message is recieved on a subscribed topic.
 def mqtt_callback(topic, msg):
@@ -110,10 +138,25 @@ def mqtt_callback(topic, msg):
         ready = int(0)
         if old_gamestate[0] == 0:
             #PLAY START MUSIC
+            pwm0.duty(30)
+            for i in start:
+                pwm0.freq(i)
+                time.sleep(0.2) #in seconds
+            pwm0.duty(0)
     if (gamestate[0] == 2) and (old_gamestate[0] != 2):
         ###### PLAY WINNING MUSIC
+        pwm0.duty(30)
+        for i in win:
+            pwm0.freq(i)
+            time.sleep(0.2) #in seconds
+        pwm0.duty(0)
     if (gamestate[0] == 1) and (old_gamestate[0] != 1):
         ###### PLAY LOSING MUSIC
+        pwm0.duty(30)
+        for i in lose:
+            pwm0.freq(i)
+            time.sleep(0.2) #in seconds
+        pwm0.duty(0)
 
 
 # Set callback function

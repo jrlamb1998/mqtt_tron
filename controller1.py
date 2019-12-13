@@ -125,6 +125,8 @@ win = [C5,CS5,D5,DS5,E5,E5,E5,E5,1,1]
 
 loss = [E3,DS3,D3,CS3,C3,C3,C3,C3,1,1]
 
+####################################
+
 ################ MQTT GAMESTATE DOWNLOAD ###############
 # Define function to execute when a message is recieved on a subscribed topic.
 def mqtt_callback(topic, msg):
@@ -151,11 +153,11 @@ def mqtt_callback(topic, msg):
         pwm0.duty(0)
     if (gamestate[0] == 2) and (old_gamestate[0] != 2):
         ###### PLAY LOSING MUSIC
-            pwm0.duty(30)
-            for i in lose:
-                pwm0.freq(i)
-                time.sleep(0.2) #in seconds
-            pwm0.duty(0)
+        pwm0.duty(30)
+        for i in lose:
+            pwm0.freq(i)
+            time.sleep(0.2) #in seconds
+        pwm0.duty(0)
 
 
 # Set callback function
